@@ -21,11 +21,32 @@ document.addEventListener("DOMContentLoaded", () => {
         const spotsLeft = details.max_participants - details.participants.length;
 
         activityCard.innerHTML = `
-          <h4>${name}</h4>
-          <p>${details.description}</p>
-          <p><strong>Schedule:</strong> ${details.schedule}</p>
-          <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
+          <h4 class="activity-title">${name}</h4>
+          <div class="activity-details">
+            <p>${details.description}</p>
+            <p><strong>Schedule:</strong> ${details.schedule}</p>
+            <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
+            <p><strong>Participants:</strong></p>
+            <ul>
+              ${details.participants
+                .map(
+                  (participant) =>
+                    `<li class="participant">${participant}</li>`
+                )
+                .join("")}
+            </ul>
+          </div>
         `;
+
+        // Add toggle functionality for collapsing/expanding details
+        const title = activityCard.querySelector(".activity-title");
+        const detailsDiv = activityCard.querySelector(".activity-details");
+        detailsDiv.style.display = "none"; // Initially collapsed
+
+        title.addEventListener("click", () => {
+          detailsDiv.style.display =
+            detailsDiv.style.display === "none" ? "block" : "none";
+        });
 
         activitiesList.appendChild(activityCard);
 
@@ -80,6 +101,23 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Error signing up:", error);
     }
   });
+
+  // Add dark mode toggle
+  const toggleDarkMode = () => {
+    document.body.classList.toggle("dark-mode");
+    document.querySelectorAll("header, section, .activity-card, button, footer").forEach((el) => {
+      el.classList.toggle("dark-mode");
+    });
+  };
+
+  // Create and add dark mode toggle button
+  const darkModeButton = document.createElement("button");
+  darkModeButton.textContent = "Toggle Dark Mode";
+  darkModeButton.style.position = "fixed";
+  darkModeButton.style.top = "10px";
+  darkModeButton.style.right = "10px";
+  darkModeButton.addEventListener("click", toggleDarkMode);
+  document.body.appendChild(darkModeButton);
 
   // Initialize app
   fetchActivities();
