@@ -14,6 +14,16 @@
         "--reload"
       ],
       "jinja": true
-    }
+    },
+    {
+      "name": "Debug Rust Application",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/target/debug/rust_app",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "cargo build",
+      "stopOnEntry": false
+    }    
   ]
 }
