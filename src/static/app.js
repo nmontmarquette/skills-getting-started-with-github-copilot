@@ -4,7 +4,59 @@ document.addEventListener("DOMContentLoaded", () => {
   const signupForm = document.getElementById("signup-form");
   const messageDiv = document.getElementById("message");
 
-  // Function to fetch activities from API
+  // Handle unregister functionality
+  async function unregisterStudent(activity, email) {
+    try {
+      const response = await fetch(
+        `/activities/${encodeURIComponent(activity)}/unregister?email=${encodeURIComponent(email)}`,
+        {
+          method: "POST",
+        }
+      );
+
+      const result = await response.json();
+
+      if (response.ok) {
+        messageDiv.textContent = result.message;
+        messageDiv.className = "success";
+        fetchActivities(); // Refresh activities list
+      } else {
+        messageDiv.textContent = result.detail || "An error occurred";
+        messageDiv.className = "error";
+      }
+
+      messageDiv.classList.remove("hidden");
+
+      // Hide message after 5 seconds
+      setTimeout(() => {
+        messageDiv.classList.add("hidden");
+      }, 5000);
+    } catch (error) {
+      messageDiv.textContent = "Failed to unregister. Please try again.";
+      messageDiv.className = "error";
+      messageDiv.classList.remove("hidden");
+      console.error("Error unregistering:", error);
+    }
+  }
+
+  // Add unregister button to each participant
+  function addUnregisterButtons(activityCard, activityName, participants) {
+    const participantList = activityCard.querySelector("ul");
+    participants.forEach((participant) => {
+      const listItem = participantList.querySelector(`li:contains(${participant})`);
+      if (listItem) {
+        const unregisterButton = document.createElement("button");
+        unregisterButton.textContent = "Unregister";
+        unregisterButton.className = "unregister-button";
+        unregisterButton.addEventListener("click", () => {
+          unregisterStudent(activityName, participant);
+        });
+        listItem.appendChild(unregisterButton);
+      }
+    });
+  }
+
+  // Modify fetchActivities to include unregister buttons
   async function fetchActivities() {
     try {
       const response = await fetch("/activities");
@@ -37,6 +89,9 @@ document.addEventListener("DOMContentLoaded", () => {
             </ul>
           </div>
         `;
+
+        // Add unregister buttons
+        addUnregisterButtons(activityCard, name, details.participants);
 
         // Add toggle functionality for collapsing/expanding details
         const title = activityCard.querySelector(".activity-title");
